@@ -1,0 +1,62 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<dom-module id='fc-group-selector'>
+	<style>
+		:host{display:block;overflow:auto;}
+		#resourceProvider{padding: 15px 0;}
+		#resourceProvider div{margin:5px 0;padding:5px;border-bottom:1px solid #ccc;cursor:pointer;}
+		#resourceProviderTrigger{border-bottom: 1px dotted #777;}
+	</style>
+	<template>
+		<iron-ajax id='resourceProviderTrigger'
+			handleAs="json"
+			method="GET"
+			last-response="{{resourceResponse}}"
+			on-response="handleResponse"
+			class="text-primary"
+		>{{labelStr}}</iron-ajax>
+		
+		<div id='resourceProvider'>
+			<template is='dom-repeat' items="{{resourceResponse.nodes}}">
+			<div on-click="updateGroupId" style$="{{setLevel(item.level)}}">{{item.label}}</div>
+			</template>
+		</div>
+	</template>
+	<script>
+		Polymer({
+			is: 'fc-group-selector',
+			properties: {
+				url: String,
+				type: String,
+				selected: {
+					type: String,
+					value: null,
+					notify: true,
+					reflectToAttribute: true
+				}
+			},
+			ready: function() {
+				this.requestUrl = this.url + '/' + this.type;
+				
+				var resourceStrFromStorage = sessionStorage.getItem(this.requestUrl);
+				if(resourceStrFromStorage) {
+					this.resourceResponse = JSON.parse(resourceStrFromStorage);
+				} else {
+					this.$.resourceProviderTrigger.url = this.requestUrl;
+					this.$.resourceProviderTrigger.generateRequest();
+				}
+			},
+			handleResponse: function() {
+				sessionStorage.setItem(this.requestUrl, JSON.stringify(this.resourceResponse));
+			},
+			updateGroupId: function(e) {
+				this.selected = e.model.item.id;
+				this.labelStr	= e.model.item.label;
+			},
+			setLevel: function(level) {
+				return "padding-left: " + ((level * 25) + 5) + "px";
+			}
+		});
+	</script>
+</dom-module>

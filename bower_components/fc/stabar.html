@@ -1,0 +1,103 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id='fc-stabar'>
+<style>
+	:host{background:#f8f8f8;display:block;overflow:auto;padding-top:1px;}
+	
+	.site-label{float:left;overflow:hidden;padding-top:1px;padding-right:3px;}
+	.site-label .text{min-width:100px;max-width:360px;display:inline-block;line-height:30px;font-size:12px;text-decoration:none;color:#777;}
+	.site-label .caret{line-height:30px;position:relative;top:-1px;color:#aaa;}
+	.site-label .start{transform:rotate(-90deg);}
+	.site-label .end{transform:rotate(90deg);}
+	
+	.tab{border-radius:4px 4px 0 0;margin-right:2px;background:#eee;font-size:14px;height:32px;line-height:30px;padding:0;text-align:center;}
+	.tab i{padding:0 10px;height:36px;width:36px;font-size:18px;color:#aaa;}
+	.tab .module-name{display:block;margin-right:12px;color:#aaa;}
+	
+	.spladm{border-top:3px solid #c34f4a;}
+	.spladm.active{background:#c34f4a;}
+	.spladm.active i{color:white;}
+	.spladm.active .module-name{color:white;}
+	
+	.site-admin{border-top:3px solid #337ab7;}
+	.site-admin.active{background:#337ab7;}
+	.site-admin.active i{color:white;}
+	.site-admin.active .module-name{color:white;}
+	
+	.shopadm{border-top:3px solid #ffa500;}
+	.shopadm.active {background:#ffa500;}
+	.shopadm.active i{color:white;}
+	.shopadm.active .module-name{color:white;}
+	
+	.wxadm{border-top:3px solid #00bc0c;}
+	.wxadm.active{background:#00bc0c;}
+	.wxadm.active i{color:white;}
+	.wxadm.active .module-name{color:white;}
+	
+	.personal-settings{margin:1px 1px 0 0;}
+</style>
+<template>
+	<div class='site-label'>
+		<span class="caret start"></span>
+		<span class="text">[[siteLabel]]</span>
+		<span class="caret end"></span>	
+	</div>
+	
+	<template is='dom-repeat' items="[[moduleTabs]]">
+	<a class$='{{activeTabClass(item.className)}}' href='[[item.homeUrl]]'>
+		<div class='pull-left'>
+			<i class$='{{iconClass(item.iconName)}}'></i>
+		</div>
+		<div class='pull-left module-name'>[[item.label]]</div>
+	</a>
+	</template>
+	
+	<div class='dropdown pull-right personal-settings'>
+		<button type='button' class='btn btn-default btn-sm' data-toggle='dropdown' aria-haspopup="true">
+			<i class='fa fa-user'></i>&nbsp;&nbsp;<span>[[loginName]]</span>&nbsp;&nbsp;<span class='caret'></span>
+		</button>
+		<ul class='dropdown-menu' role='menu'>
+			<li><a href='/admin/personal-info'><i class='fa fa-key'></i> Profile</a></li>
+			<li class="divider"></li>
+			<li><a href='/sp/logout'><i class='fa fa-sign-out'></i> Logout</a></li>
+		</ul>
+	</div>
+</template>
+</dom-module>
+
+<script>
+	Polymer({
+		is: 'fc-stabar',
+		properties: {
+			activeTab: String,
+			siteLabel: String,
+			loginName: String,
+			moduleTabs: Array
+		},
+		ready: function() {
+			switch(this.activeTab) {
+				case 'spladm':
+					this.style.borderBottom = "2px solid #c34f4a";
+					break;
+				case 'site-admin':
+					this.style.borderBottom = "2px solid #337ab7";
+					break;
+				case 'shopadm':
+					this.style.borderBottom = "2px solid #ffa500";
+					break;
+				case 'wxadm':
+					this.style.borderBottom = "2px solid #00bc0c";
+					break;
+			}
+		},
+		activeTabClass: function(className) {
+			if(className == this.activeTab) {
+				return 	'pull-left tab active ' + className;
+			}
+			return 'pull-left tab ' + className;
+		},
+		iconClass: function(classSuffix) {
+			return 'fa fa-' + classSuffix;
+		}
+	});
+</script>

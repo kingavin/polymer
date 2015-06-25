@@ -41,3 +41,17 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+#bower
+.settings
+demo
+test
+.bower.json
+.gitignore
+bower.json
+index.html
+*.md
+LICENSE
+package.json
+.buildpath
+.project

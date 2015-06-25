@@ -1,0 +1,25 @@
+<script>
+	EditorBehavior = {
+		properties: {
+			data: {
+				type: Object
+			}
+		},
+		ready: function() {
+			var defaultValueObject = {};
+			
+			var defaultValueEls = document.querySelectorAll('[default-value]');
+			for(var i = 0; i < defaultValueEls.length; i++) {
+				var dve = defaultValueEls[i];
+				var attrName = dve.getAttribute('name');
+				
+				defaultValueObject[attrName] = dve.getAttribute('default-value');
+			}
+
+			this.data = defaultValueObject;
+		},
+		showIf: function(dataValue, testString) {
+			return dataValue == testString;
+		}
+	};
+</script>

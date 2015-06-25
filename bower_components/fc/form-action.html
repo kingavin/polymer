@@ -1,0 +1,107 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-header-panel/paper-header-panel.html">
+
+<dom-module id='fc-form-action'>
+	<style>
+		:host{display:block;margin-bottom: 15px;height: calc(100% - 110px);}
+		.paper-header{padding:5px 20px;height:45px;transition:height 0.2s;background: #f8f8f8;}
+		action-title{display:inline-block;line-height:40px;margin-left:0;font-size:12px;transition:font-size 0.2s, margin-left 0.2s, line-height 0.2s;}
+		paper-button{float:right;margin-top:0px;margin-left:10px;transition:margin-top 0.2s;}
+		
+		.paper-header.tall{height: 100px;}
+		.paper-header.tall action-title{line-height:80px;margin-left:40px;font-size:20px;}
+		.paper-header.tall paper-button{margin-top:54px;}
+		
+		.content {padding-top: 30px;}
+	</style>
+	<template>
+		<iron-ajax id='formSaver'
+			handleAs="json"
+			last-response="{{saverResponse}}"
+			on-response="handleResponse"></iron-ajax>
+		<paper-header-panel mode="waterfall-tall" tall-class="tall">
+			<div class="paper-header">
+				<action-title>{{actionTitle}}</action-title>
+				<paper-button on-click='saveResource' class='btn-primary' raised>保存</paper-button>
+			</div>
+			<div class='content'><content id='formContent'></content></div>
+		</paper-header-panel>
+	</template>
+	<script>
+		Polymer({
+			is: 'fc-form-action',
+			properties: {
+				resourceUrl: String,
+				actionTitle: String,
+				data: {
+					type: Object,
+					notify: true,
+					value: {}
+				},
+				validator: {
+					type: Object,
+					notify: true,
+					value: {}
+				},
+				teststring: {
+					type: String,
+					notify: true,
+					value: {}
+				}
+			},
+			attached: function() {
+				var tempValidator = {};
+				var requiredValidates = this.querySelectorAll('[required]');
+				
+				for(var i = 0; i < requiredValidates.length; i++) {
+					var validatorName = requiredValidates[i].getAttribute('name') + '_required';
+					tempValidator[validatorName] = true;
+				}
+				
+				this.validator = tempValidator;
+			},
+			saveResource: function() {
+				var validFlag = true;
+				var tempValidator = {};
+				
+				for(var key in this.validator) {
+					tempValidator[key] = true;
+				}
+				
+				for(var key in this.validator) {
+					var validateParams = key.split('_');
+					var validateKey = validateParams[0];
+					var validateType = validateParams[1];
+					
+					if(this.data[validateKey] == undefined || this.data[validateKey] == "") {
+						tempValidator[key] = false;
+						validFlag = false;
+					}
+				}
+				this.validator = tempValidator;
+				
+				if(validFlag) {
+					if(this.data.id == undefined) {
+						this.$.formSaver.method = "POST";
+						this.$.formSaver.url = this.getAttribute('crud-url');
+					} else {
+						this.$.formSaver.method = "PUT";
+						this.$.formSaver.url = this.getAttribute('crud-url') + '/' + this.data.id;
+					}
+					
+					this.$.formSaver.body = JSON.stringify(this.data);
+					this.$.formSaver.contentType = "application/json;charset=UTF-8";
+					this.$.formSaver.generateRequest();
+				}
+			},
+			handleResponse: function() {
+				var responseObj = this.$.formSaver.lastResponse;
+				this.data.id = responseObj.id;
+				alert('当前文件已经保存！');
+			}
+			
+		});
+	</script>
+</dom-module>

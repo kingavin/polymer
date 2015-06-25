@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="umeditor/themes/default/css/umeditor.css">
+<script src="umeditor/umeditor.config.js"></script>
+<script src="umeditor/umeditor.js"></script>
+<script src="umeditor/lang/zh-cn/zh-cn.js"></script>
+
+<dom-module id='fc-umeditor'>
+	<style>
+		:host{display:block;}
+	</style>
+	<template>
+		<script id="{{editorId}}" type="text/plain"></script>		
+	</template>
+	<script>
+		Polymer({
+			is: 'fc-umeditor',
+			properties: {
+				editorId: String,
+				bv: {
+					type: String,
+					value: null,
+					notify: true
+				}
+			},
+			attached: function() {
+				var ME = this;
+				
+				var um = UM.getEditor(this.editorId);
+				um.setWidth("98%");
+				um.setHeight(300);
+      			
+				um.addListener('contentChange', function () {
+					ME.bv = um.getContent();
+				});
+				var editorBodyContainer = document.querySelector('#' + this.editorId);
+				editorBodyContainer.style.width = '99%';
+			}
+		});
+	</script>
+</dom-module>
